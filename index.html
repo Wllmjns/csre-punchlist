@@ -5,304 +5,362 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="CSRE Punchlist">
+<meta name="apple-mobile-web-app-title" content="CSRE">
 <meta name="theme-color" content="#0F2645">
 <title>CSRE Punchlist</title>
 <style>
-  :root {
-    --navy:      #0F2645;
-    --navy-mid:  #1A3A6B;
-    --navy-lt:   #2A5298;
-    --navy-pale: #E8EEF8;
-    --bg:        #F2F5FB;
-    --surface:   #FFFFFF;
-    --surface2:  #EBF0F9;
-    --border:    #C8D4E8;
-    --border2:   #A8BCE0;
-    --text:      #0F2645;
-    --muted:     #5A6E8C;
-    --hint:      #8FA3C0;
-    --green:     #1B6B3A;
-    --green-bg:  #E2F5EB;
-    --amber:     #7A4800;
-    --amber-bg:  #FFF0D6;
-    --red:       #8B1F1F;
-    --red-bg:    #FCEAEA;
-    --r:         12px;
-    --r-sm:      8px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --navy:     #0F2645;
+  --navy-mid: #1A3A6B;
+  --navy-lt:  #2A5298;
+  --pale:     #E8EEF8;
+  --bg:       #F2F5FB;
+  --surface:  #FFFFFF;
+  --surf2:    #EBF0F9;
+  --border:   #C8D4E8;
+  --border2:  #A8BCE0;
+  --text:     #0F2645;
+  --muted:    #5A6E8C;
+  --hint:     #8FA3C0;
+  --green:    #1B6B3A;
+  --green-bg: #E2F5EB;
+  --amber:    #7A4800;
+  --amber-bg: #FFF0D6;
+  --red:      #8B1F1F;
+  --red-bg:   #FCEAEA;
+  --r: 12px; --rsm: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; overscroll-behavior: none; }
 
-  html { height: 100%; }
-  body {
-    height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 16px;
-    line-height: 1.4;
-    /* Prevent elastic scroll bounce showing white */
-    overscroll-behavior: none;
-  }
+/* Shell */
+.shell { display: flex; flex-direction: column; height: 100dvh; }
 
-  /* ─── Shell layout ─────────────────────────────────────── */
-  .shell {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    height: 100dvh; /* dynamic viewport height — accounts for iOS browser bars */
-  }
+/* Topbar */
+.topbar { flex-shrink: 0; background: var(--navy); color: #fff; padding: 0 1rem; height: calc(54px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); display: flex; align-items: center; justify-content: space-between; z-index: 50; }
+.brand { font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+.brand em { color: #7EB3F0; font-style: normal; font-weight: 400; }
+.role-pill { font-size: 13px; padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(126,179,240,.4); color: rgba(255,255,255,.65); cursor: pointer; background: transparent; white-space: nowrap; }
+.role-pill.admin { border-color: #7EB3F0; color: #7EB3F0; }
 
-  /* ─── Top bar ──────────────────────────────────────────── */
-  .topbar {
-    flex-shrink: 0;
-    background: var(--navy);
-    color: #fff;
-    padding: 0 1rem;
-    height: 54px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    /* Safe area for notch/dynamic island */
-    padding-top: env(safe-area-inset-top);
-    height: calc(54px + env(safe-area-inset-top));
-  }
-  .brand { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
-  .brand em { color: #7EB3F0; font-style: normal; font-weight: 400; }
-  .role-pill {
-    font-size: 13px; padding: 6px 14px; border-radius: 20px;
-    border: 1px solid rgba(126,179,240,0.4); color: rgba(255,255,255,0.65);
-    cursor: pointer; white-space: nowrap; background: transparent;
-  }
-  .role-pill.admin { border-color: #7EB3F0; color: #7EB3F0; }
+/* Scroll body */
+.body { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding: 1rem .875rem calc(5rem + env(safe-area-inset-bottom)); }
 
-  /* ─── Scroll area ──────────────────────────────────────── */
-  .body {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-    position: relative;
-    padding: 1rem 0.875rem 6rem;
-  }
+/* DFW Map watermark */
+.map-wrap { position: fixed; bottom: 0; left: 0; right: 0; height: 55%; pointer-events: none; z-index: 0; overflow: hidden; opacity: 1; }
+.map-wrap svg { position: absolute; bottom: 0; width: 100%; height: 100%; }
+.body > *:not(.map-wrap) { position: relative; z-index: 1; }
 
-  /* ─── Skyline watermark ────────────────────────────────── */
-  .skyline {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 180px;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-  .skyline svg { position: absolute; bottom: 0; width: 100%; height: 100%; }
-  .body > *:not(.skyline) { position: relative; z-index: 1; }
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 1rem; }
+.stat { background: var(--navy); border-radius: var(--r); padding: .7rem .875rem; }
+.stat-label { font-size: 11px; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+.stat-val { font-size: 28px; font-weight: 700; color: #fff; line-height: 1; }
 
-  /* ─── Stats ────────────────────────────────────────────── */
-  .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 1rem; }
-  .stat { background: var(--navy); border-radius: var(--r); padding: 0.75rem 0.875rem; }
-  .stat-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
-  .stat-val { font-size: 28px; font-weight: 700; color: #fff; line-height: 1; }
+/* Section tabs */
+.sec-tabs { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 1rem; }
+.sec-tab { flex: 1; padding: 12px; font-size: 16px; font-weight: 500; border: none; background: transparent; color: var(--muted); cursor: pointer; border-right: 1px solid var(--border); font-family: inherit; }
+.sec-tab:last-child { border-right: none; }
+.sec-tab.on { background: var(--navy); color: #fff; }
 
-  /* ─── Tabs ─────────────────────────────────────────────── */
-  .tabs { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 1rem; }
-  .tab { flex: 1; padding: 12px; font-size: 16px; font-weight: 500; border: none; background: transparent; color: var(--muted); cursor: pointer; border-right: 1px solid var(--border); }
-  .tab:last-child { border-right: none; }
-  .tab.active { background: var(--navy); color: #fff; }
+/* Sub tabs (active/done) */
+.sub-tabs { display: flex; gap: 6px; margin-bottom: .875rem; }
+.sub-tab { flex: 1; padding: 9px; font-size: 14px; font-weight: 500; border: 1px solid var(--border); border-radius: var(--rsm); background: var(--surface); color: var(--muted); cursor: pointer; text-align: center; font-family: inherit; }
+.sub-tab.on { background: var(--navy-mid); color: #fff; border-color: var(--navy-mid); }
 
-  /* ─── Filter chips ─────────────────────────────────────── */
-  .chips { display: flex; gap: 7px; margin-bottom: 1rem; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; }
-  .chips::-webkit-scrollbar { display: none; }
-  .chip { padding: 7px 16px; font-size: 14px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); color: var(--muted); cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-  .chip.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+/* Filter bar */
+.filter-bar { display: flex; gap: 6px; margin-bottom: .875rem; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; flex-wrap: nowrap; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-bar select { font-size: 13px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); color: var(--muted); cursor: pointer; white-space: nowrap; flex-shrink: 0; font-family: inherit; -webkit-appearance: none; appearance: none; padding-right: 24px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235A6E8C'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; }
+.filter-bar select.active-filter { background-color: var(--navy); color: #fff; border-color: var(--navy); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='white'/%3E%3C/svg%3E"); }
+.clear-filters { font-size: 12px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); color: var(--muted); cursor: pointer; white-space: nowrap; flex-shrink: 0; font-family: inherit; display: none; }
+.clear-filters.visible { display: block; }
 
-  /* ─── Ticket cards ─────────────────────────────────────── */
-  .list { display: flex; flex-direction: column; gap: 10px; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
-  .card.done { opacity: 0.6; }
-  .card-head { padding: 1rem 1rem 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-  .card-title { font-size: 17px; font-weight: 600; line-height: 1.3; flex: 1; color: var(--navy); }
-  .card.done .card-title { text-decoration: line-through; }
-  .pdot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
-  .ph { background: #D94040; } .pm { background: #E09020; } .pl { background: #2E8B57; }
-  .card-meta { padding: 5px 1rem 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
-  .tid { font-size: 12px; color: var(--hint); }
-  .card-desc { padding: 6px 1rem 0; font-size: 15px; color: var(--muted); line-height: 1.5; }
-  .card-notes { margin: 8px 1rem 0; background: var(--navy-pale); border-radius: var(--r-sm); padding: 9px 11px; font-size: 13px; color: var(--navy-mid); white-space: pre-wrap; line-height: 1.6; border-left: 3px solid var(--navy-lt); }
-  .card-bar { padding: 0.7rem 0.75rem 0.8rem; display: flex; align-items: center; gap: 7px; margin-top: 9px; border-top: 1px solid var(--border); background: var(--surface2); flex-wrap: wrap; }
+/* Cards */
+.list { display: flex; flex-direction: column; gap: 10px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.card.done-card { opacity: .6; }
+.card-head { padding: 1rem 1rem 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.card-title { font-size: 17px; font-weight: 600; line-height: 1.3; flex: 1; color: var(--navy); }
+.card.done-card .card-title { text-decoration: line-through; }
+.pdot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.ph { background: #D94040; } .pm { background: #E09020; } .pl { background: #2E8B57; }
+.card-meta { padding: 5px 1rem 0; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 12px; color: var(--muted); }
+.tid { font-size: 11px; color: var(--hint); }
+.card-desc { padding: 6px 1rem 0; font-size: 15px; color: var(--muted); line-height: 1.5; }
+.card-notes { margin: 8px 1rem 0; background: var(--pale); border-radius: var(--rsm); padding: 9px 11px; font-size: 12px; color: var(--navy-mid); white-space: pre-wrap; line-height: 1.6; border-left: 3px solid var(--navy-lt); }
+.card-bar { padding: .7rem .75rem .8rem; display: flex; align-items: center; gap: 6px; margin-top: 9px; border-top: 1px solid var(--border); background: var(--surf2); flex-wrap: wrap; }
+.s-sel { font-size: 14px; border: 1px solid var(--border); border-radius: var(--rsm); background: var(--surface); color: var(--muted); padding: 8px 10px; cursor: pointer; flex: 1; min-width: 90px; font-family: inherit; }
+.abtn { height: 38px; padding: 0 12px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--border); border-radius: var(--rsm); background: var(--surface); cursor: pointer; font-size: 14px; white-space: nowrap; font-family: inherit; }
+.abtn:active { opacity: .7; }
+.abtn.note    { color: var(--navy-lt); border-color: var(--border2); background: var(--pale); }
+.abtn.done    { color: var(--green);   border-color: #A8D8BC; background: var(--green-bg); }
+.abtn.del     { color: var(--red);     border-color: #E8B8B8; background: var(--red-bg); }
+.abtn.restore { color: var(--navy-lt); border-color: var(--border2); background: var(--pale); }
 
-  /* ─── Status select ────────────────────────────────────── */
-  .s-sel { font-size: 15px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--muted); padding: 9px 10px; cursor: pointer; flex: 1; min-width: 100px; font-family: inherit; }
+/* Badges */
+.badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.bo { background: var(--pale);     color: var(--navy-lt); }
+.bi { background: var(--amber-bg); color: var(--amber); }
+.bd { background: var(--green-bg); color: var(--green); }
+.tag { display: inline-flex; align-items: center; font-size: 11px; padding: 2px 7px; border-radius: 4px; background: var(--surf2); color: var(--muted); border: 1px solid var(--border); }
+.hm-tag { background: #FFF0D6; color: #7A4800; border-color: #F5D8A0; }
 
-  /* ─── Action buttons ───────────────────────────────────── */
-  .abtn { height: 42px; padding: 0 14px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); cursor: pointer; font-size: 15px; white-space: nowrap; font-family: inherit; }
-  .abtn:active { opacity: 0.7; }
-  .abtn.note    { color: var(--navy-lt); border-color: var(--border2); background: var(--navy-pale); }
-  .abtn.done    { color: var(--green);   border-color: #A8D8BC; background: var(--green-bg); }
-  .abtn.del     { color: var(--red);     border-color: #E8B8B8; background: var(--red-bg); }
-  .abtn.restore { color: var(--navy-lt); border-color: var(--border2); background: var(--navy-pale); }
+/* FAB */
+.fab { position: fixed; right: 1.25rem; bottom: calc(1.25rem + env(safe-area-inset-bottom)); width: 56px; height: 56px; border-radius: 50%; background: var(--navy-lt); color: #fff; border: none; font-size: 28px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(15,38,69,.38); z-index: 45; }
 
-  /* ─── Badges ───────────────────────────────────────────── */
-  .badge { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
-  .bo { background: var(--navy-pale); color: var(--navy-lt); }
-  .bi { background: var(--amber-bg);  color: var(--amber); }
-  .bd { background: var(--green-bg);  color: var(--green); }
+/* Overlays / sheets */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(8,20,45,.6); z-index: 100; align-items: flex-end; justify-content: center; }
+.overlay.open { display: flex; }
+.sheet { background: var(--surface); border-radius: var(--r) var(--r) 0 0; padding: 1.25rem 1.125rem; padding-bottom: calc(2rem + env(safe-area-inset-bottom)); width: 100%; max-width: 560px; max-height: 92dvh; overflow-y: auto; }
+.handle { width: 38px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 1.1rem; }
+.sheet-title { font-size: 19px; font-weight: 700; color: var(--navy); margin-bottom: 1rem; }
+.field { margin-bottom: .875rem; }
+.field label { display: block; font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 5px; }
+.field input, .field select, .field textarea { width: 100%; padding: 12px 14px; font-size: 16px; border: 1px solid var(--border); border-radius: var(--rsm); background: var(--bg); color: var(--text); font-family: inherit; -webkit-appearance: none; }
+.field textarea { height: 88px; resize: vertical; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--navy-lt); }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.sheet-foot { display: flex; gap: 9px; margin-top: 1.25rem; }
+.btn { flex: 1; padding: 14px; font-size: 16px; font-weight: 600; border-radius: var(--rsm); border: 1px solid var(--border); cursor: pointer; font-family: inherit; }
+.btn-ghost { background: var(--surf2); color: var(--muted); }
+.btn-primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+.btn-primary:disabled { opacity: .5; cursor: default; }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: .75rem 0; border-top: 1px solid var(--border); margin-top: .25rem; }
+.toggle-label { font-size: 15px; color: var(--text); font-weight: 500; }
+.toggle-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.toggle { position: relative; width: 48px; height: 28px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--border2); border-radius: 28px; cursor: pointer; transition: .2s; }
+.toggle-slider:before { content: ""; position: absolute; width: 22px; height: 22px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .2s; }
+.toggle input:checked + .toggle-slider { background: var(--navy-lt); }
+.toggle input:checked + .toggle-slider:before { transform: translateX(20px); }
 
-  /* ─── FAB ──────────────────────────────────────────────── */
-  .fab {
-    position: fixed; right: 1.25rem;
-    bottom: calc(1.25rem + env(safe-area-inset-bottom));
-    width: 56px; height: 56px; border-radius: 50%;
-    background: var(--navy-lt); color: #fff; border: none;
-    font-size: 28px; cursor: pointer; display: none;
-    align-items: center; justify-content: center;
-    box-shadow: 0 4px 18px rgba(15,38,69,.38); z-index: 45;
-  }
+/* PIN sheet */
+.pin-sheet { text-align: center; }
+.pin-sheet h2 { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: .4rem; }
+.pin-sheet p { font-size: 15px; color: var(--muted); margin-bottom: 1rem; }
+.pin-input { width: 100%; text-align: center; font-size: 34px; letter-spacing: .35em; padding: 14px; border: 1px solid var(--border); border-radius: var(--rsm); background: var(--bg); color: var(--navy); font-family: inherit; margin-bottom: .75rem; -webkit-appearance: none; }
+.pin-err { font-size: 14px; color: var(--red); min-height: 20px; margin-bottom: .5rem; }
 
-  /* ─── Sheet modals ─────────────────────────────────────── */
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(8,20,45,.6); z-index: 100; align-items: flex-end; justify-content: center; }
-  .overlay.open { display: flex; }
-  .sheet {
-    background: var(--surface); border-radius: var(--r) var(--r) 0 0;
-    padding: 1.25rem 1.125rem;
-    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
-    width: 100%; max-width: 560px; max-height: 92dvh; overflow-y: auto;
-  }
-  .handle { width: 38px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 1.1rem; }
-  .sheet-title { font-size: 19px; font-weight: 700; color: var(--navy); margin-bottom: 1rem; }
-  .field { margin-bottom: 0.875rem; }
-  .field label { display: block; font-size: 14px; color: var(--muted); font-weight: 500; margin-bottom: 5px; }
-  .field input, .field select, .field textarea {
-    width: 100%; padding: 13px 14px; font-size: 17px;
-    border: 1px solid var(--border); border-radius: var(--r-sm);
-    background: var(--bg); color: var(--text); font-family: inherit;
-    -webkit-appearance: none;
-  }
-  .field textarea { height: 96px; resize: vertical; }
-  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--navy-lt); }
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .sheet-foot { display: flex; gap: 9px; margin-top: 1.25rem; }
-  .btn { flex: 1; padding: 15px; font-size: 17px; font-weight: 600; border-radius: var(--r-sm); border: 1px solid var(--border); cursor: pointer; font-family: inherit; }
-  .btn-ghost { background: var(--surface2); color: var(--muted); }
-  .btn-primary { background: var(--navy); color: #fff; border-color: var(--navy); }
-  .btn-primary:disabled { opacity: .5; cursor: default; }
+/* Empty / loading */
+.empty { text-align: center; padding: 3rem 0; color: var(--hint); font-size: 15px; }
+.empty-icon { font-size: 34px; margin-bottom: 10px; }
+.loading { text-align: center; padding: 3rem; color: var(--hint); font-size: 15px; }
+.err-banner { background: var(--red-bg); border: 1px solid #E8B8B8; border-radius: var(--r); padding: 1rem; color: var(--red); font-size: 14px; line-height: 1.5; margin-bottom: 1rem; }
+.err-banner strong { display: block; margin-bottom: .25rem; }
 
-  /* ─── PIN sheet ────────────────────────────────────────── */
-  .pin-sheet { text-align: center; }
-  .pin-sheet h2 { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: .4rem; }
-  .pin-sheet p { font-size: 15px; color: var(--muted); margin-bottom: 1.1rem; }
-  .pin-input {
-    width: 100%; text-align: center; font-size: 34px; letter-spacing: .35em;
-    padding: 14px; border: 1px solid var(--border); border-radius: var(--r-sm);
-    background: var(--bg); color: var(--navy); font-family: inherit;
-    margin-bottom: .75rem; -webkit-appearance: none;
-  }
-  .pin-err { font-size: 14px; color: var(--red); min-height: 20px; margin-bottom: .5rem; }
+/* Toast */
+.toast { position: fixed; bottom: calc(5rem + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: var(--navy); color: #fff; font-size: 14px; padding: 10px 20px; border-radius: 20px; z-index: 300; opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; }
 
-  /* ─── Empty / loading ──────────────────────────────────── */
-  .empty { text-align: center; padding: 3.5rem 0; color: var(--hint); font-size: 16px; }
-  .empty-icon { font-size: 36px; margin-bottom: 10px; }
-  .loading { text-align: center; padding: 3rem; color: var(--hint); font-size: 16px; }
-
-  /* ─── Toast ────────────────────────────────────────────── */
-  .toast {
-    position: fixed; bottom: calc(5rem + env(safe-area-inset-bottom));
-    left: 50%; transform: translateX(-50%);
-    background: var(--navy); color: #fff; font-size: 15px;
-    padding: 11px 20px; border-radius: 20px; z-index: 300;
-    opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap;
-  }
-  .toast.show { opacity: 1; }
-
-  /* ─── Error banner ─────────────────────────────────────── */
-  .err-banner { background: var(--red-bg); border: 1px solid #E8B8B8; border-radius: var(--r); padding: 1rem; color: var(--red); font-size: 14px; line-height: 1.5; margin-bottom: 1rem; }
-  .err-banner strong { display: block; margin-bottom: .25rem; }
+/* Result count */
+.result-count { font-size: 12px; color: var(--hint); margin-bottom: .625rem; }
 </style>
 </head>
 <body>
 
-<!-- ─── Skyline watermark ──────────────────────────────────── -->
-<div class="skyline" aria-hidden="true">
-  <svg viewBox="0 0 1200 180" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
-    <g fill="#1A3A6B" opacity="0.07">
-      <rect x="0" y="168" width="1200" height="12"/>
-      <ellipse cx="140" cy="74" rx="16" ry="16"/>
-      <rect x="137" y="90" width="6" height="78"/>
-      <rect x="120" y="142" width="40" height="26"/>
-      <rect x="320" y="25" width="36" height="143"/>
-      <polygon points="320,25 338,6 356,25"/>
-      <rect x="280" y="62" width="28" height="106"/>
-      <polygon points="430,168 430,47 440,37 450,47 460,37 470,47 470,168"/>
-      <rect x="510" y="52" width="34" height="116"/>
-      <rect x="514" y="42" width="26" height="12"/>
-      <rect x="570" y="70" width="44" height="98"/>
-      <rect x="576" y="60" width="32" height="12"/>
-      <rect x="630" y="98" width="24" height="70"/>
-      <rect x="660" y="83" width="28" height="85"/>
-      <rect x="694" y="108" width="20" height="60"/>
-      <rect x="730" y="66" width="38" height="102"/>
-      <rect x="736" y="56" width="26" height="12"/>
-      <rect x="780" y="79" width="30" height="89"/>
-      <rect x="820" y="56" width="32" height="112"/>
-      <polygon points="820,56 836,42 852,56"/>
-      <rect x="865" y="93" width="22" height="75"/>
-      <rect x="893" y="77" width="26" height="91"/>
-      <rect x="955" y="60" width="34" height="108"/>
-      <rect x="960" y="50" width="24" height="12"/>
-      <rect x="1000" y="108" width="28" height="60"/>
-      <rect x="1034" y="88" width="22" height="80"/>
-      <rect x="1062" y="118" width="18" height="50"/>
-      <rect x="200" y="138" width="30" height="30"/>
-      <rect x="235" y="125" width="25" height="43"/>
-      <rect x="1090" y="132" width="26" height="36"/>
-      <rect x="0" y="150" width="28" height="18"/>
-      <rect x="32" y="140" width="22" height="28"/>
-      <rect x="60" y="133" width="30" height="35"/>
-    </g>
-  </svg>
+<!-- DFW Map Watermark -->
+<div class="map-wrap" aria-hidden="true">
+<svg viewBox="0 0 500 400" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+  <g opacity="0.055" fill="none" stroke="#1A3A6B">
+    <!-- Major highways skeleton -->
+    <!-- I-35E N-S through Dallas -->
+    <path d="M 210 20 L 208 100 L 205 180 L 200 260 L 196 340 L 193 400" stroke-width="3"/>
+    <!-- I-35W N-S through Fort Worth -->
+    <path d="M 100 20 L 98 100 L 96 180 L 94 260 L 92 340 L 90 400" stroke-width="3"/>
+    <!-- I-30 E-W Dallas to Fort Worth -->
+    <path d="M 20 230 L 80 228 L 140 226 L 200 224 L 260 222 L 320 220 L 380 218 L 440 216 L 490 215" stroke-width="3"/>
+    <!-- I-20 E-W south -->
+    <path d="M 20 290 L 100 288 L 180 286 L 260 284 L 340 282 L 420 280 L 490 278" stroke-width="2.5"/>
+    <!-- I-635 LBJ loop Dallas -->
+    <path d="M 240 120 L 290 118 L 340 124 L 370 150 L 375 185 L 360 215 L 330 228 L 290 232 L 255 228 L 232 210 L 225 180 L 228 148 L 240 120" stroke-width="2"/>
+    <!-- Loop 820 Fort Worth -->
+    <path d="M 95 160 L 130 155 L 155 165 L 165 190 L 160 220 L 140 238 L 110 242 L 82 232 L 70 210 L 72 182 L 85 165 L 95 160" stroke-width="2"/>
+    <!-- I-820 north -->
+    <path d="M 95 160 L 90 130 L 88 100" stroke-width="1.5"/>
+    <!-- SH-114 NW -->
+    <path d="M 200 170 L 170 162 L 140 155 L 110 148 L 80 142 L 50 138 L 20 135" stroke-width="1.5"/>
+    <!-- I-75 N-S Central Expressway -->
+    <path d="M 270 20 L 268 80 L 266 150 L 265 220 L 264 290 L 263 360 L 262 400" stroke-width="2"/>
+    <!-- US-75 north of 635 -->
+    <path d="M 268 80 L 266 40 L 265 20" stroke-width="1.5"/>
+    <!-- I-45 SE from Dallas -->
+    <path d="M 205 260 L 220 300 L 235 340 L 248 380 L 255 400" stroke-width="2"/>
+    <!-- SH-360 Arlington area -->
+    <path d="M 145 150 L 144 200 L 143 250 L 142 300" stroke-width="1.5"/>
+    <!-- SH-183 E-W mid -->
+    <path d="M 20 198 L 80 196 L 140 194 L 200 192 L 240 192 L 280 193" stroke-width="1.5"/>
+    <!-- DFW Airport roads -->
+    <path d="M 155 120 L 168 118 L 178 125 L 180 140 L 172 152 L 158 154 L 148 146 L 147 132 L 155 120" stroke-width="1.5"/>
+    <!-- I-820 east -->
+    <path d="M 160 238 L 195 240 L 230 238" stroke-width="1.5"/>
+    <!-- Belt Line / SH-161 -->
+    <path d="M 220 140 L 218 180 L 216 220 L 215 260" stroke-width="1.5"/>
+    <!-- US 287 -->
+    <path d="M 90 310 L 120 295 L 150 280 L 180 268 L 200 260" stroke-width="1.5"/>
+    <!-- Outer roads -->
+    <path d="M 300 20 L 298 80 L 296 150 L 294 220 L 292 290" stroke-width="1.5"/>
+    <!-- SH-121 diagonal NW to SE -->
+    <path d="M 130 80 L 160 110 L 185 140 L 200 170" stroke-width="1.5"/>
+    <path d="M 185 140 L 220 152 L 255 160 L 290 165" stroke-width="1.5"/>
+    <!-- SH-26 Hurst-Euless-Bedford -->
+    <path d="M 130 175 L 155 173 L 180 172 L 200 172" stroke-width="1"/>
+  </g>
+
+  <!-- Property dots and labels -->
+  <g fill="#1A3A6B" opacity="0.18">
+    <!-- Boomer - 10875 Plano Rd, Dallas ~75238 (NE Dallas) -->
+    <circle cx="272" cy="175" r="5"/>
+    <text x="280" y="178" font-size="9" font-family="sans-serif" fill="#1A3A6B">Boomer</text>
+
+    <!-- 1312 Corporate, Arlington -->
+    <circle cx="148" cy="222" r="5"/>
+    <text x="156" y="218" font-size="9" font-family="sans-serif" fill="#1A3A6B">1312 Corp</text>
+
+    <!-- Fierro, E Corporate Dr, Arlington -->
+    <circle cx="153" cy="230" r="5"/>
+    <text x="156" y="238" font-size="9" font-family="sans-serif" fill="#1A3A6B">Fierro</text>
+
+    <!-- Royalty Row, Irving -->
+    <circle cx="198" cy="205" r="5"/>
+    <text x="164" y="200" font-size="9" font-family="sans-serif" fill="#1A3A6B">Royalty Row</text>
+
+    <!-- Hachita, Davis Blvd, North Richland Hills -->
+    <circle cx="118" cy="172" r="5"/>
+    <text x="86" y="168" font-size="9" font-family="sans-serif" fill="#1A3A6B">Hachita</text>
+
+    <!-- Industrial, Garland -->
+    <circle cx="302" cy="210" r="5"/>
+    <text x="308" y="214" font-size="9" font-family="sans-serif" fill="#1A3A6B">Industrial</text>
+
+    <!-- Lombardy, 2650 Lombardy Ln, Dallas 75220 (NW Dallas) -->
+    <circle cx="218" cy="168" r="5"/>
+    <text x="210" y="158" font-size="9" font-family="sans-serif" fill="#1A3A6B">Lombardy</text>
+
+    <!-- Marquis, Garland -->
+    <circle cx="308" cy="218" r="5"/>
+    <text x="314" y="230" font-size="9" font-family="sans-serif" fill="#1A3A6B">Marquis</text>
+
+    <!-- Mid-Sky, Midway Rd, Carrollton -->
+    <circle cx="222" cy="135" r="5"/>
+    <text x="228" y="132" font-size="9" font-family="sans-serif" fill="#1A3A6B">Mid-Sky</text>
+
+    <!-- Omega, 13725 Omega Rd, Farmers Branch -->
+    <circle cx="228" cy="158" r="5"/>
+    <text x="205" y="170" font-size="9" font-family="sans-serif" fill="#1A3A6B">Omega</text>
+
+    <!-- Potomac, 3637 Marquis Dr, Garland -->
+    <circle cx="312" cy="222" r="5"/>
+    <text x="318" y="218" font-size="9" font-family="sans-serif" fill="#1A3A6B">Potomac</text>
+
+    <!-- Program, 2512 Program Dr, Dallas 75220 (NW Dallas near Lombardy) -->
+    <circle cx="222" cy="172" r="5"/>
+    <text x="228" y="178" font-size="9" font-family="sans-serif" fill="#1A3A6B">Program</text>
+
+    <!-- Avalon MHP, Kennedale (SE Fort Worth area) -->
+    <circle cx="138" cy="272" r="5"/>
+    <text x="144" y="270" font-size="9" font-family="sans-serif" fill="#1A3A6B">Avalon</text>
+
+    <!-- Greenhill Estates, Roanoke (NW, north of Keller) -->
+    <circle cx="112" cy="118" r="5"/>
+    <text x="118" y="116" font-size="9" font-family="sans-serif" fill="#1A3A6B">Greenhill</text>
+  </g>
+
+  <!-- City labels for orientation -->
+  <g fill="#1A3A6B" opacity="0.1" font-family="sans-serif" font-size="11" font-weight="bold">
+    <text x="88" y="245">Fort Worth</text>
+    <text x="235" y="245">Dallas</text>
+    <text x="162" y="215">Arlington</text>
+    <text x="192" y="180">Irving</text>
+    <text x="215" y="120">Carrollton</text>
+    <text x="285" y="195">Garland</text>
+    <text x="100" y="148">NRH</text>
+    <text x="100" y="105">Roanoke</text>
+  </g>
+</svg>
 </div>
 
-<!-- ─── Shell ─────────────────────────────────────────────── -->
 <div class="shell">
-
   <header class="topbar">
     <div class="brand">CSRE <em>Punchlist</em></div>
     <button class="role-pill" id="role-pill" onclick="promptAdmin()">Handyman</button>
   </header>
 
-  <main class="body">
+  <main class="body" id="main-body">
 
-    <div class="stats">
+    <!-- Stats (admin only) -->
+    <div class="stats" id="stats-row" style="display:none;">
       <div class="stat"><div class="stat-label">Open</div><div class="stat-val" id="cnt-open">—</div></div>
-      <div class="stat"><div class="stat-label">In progress</div><div class="stat-val" id="cnt-prog">—</div></div>
+      <div class="stat"><div class="stat-label">In Progress</div><div class="stat-val" id="cnt-prog">—</div></div>
       <div class="stat"><div class="stat-label">Done</div><div class="stat-val" id="cnt-done">—</div></div>
     </div>
 
-    <div class="tabs">
-      <button class="tab active" id="tab-active" onclick="switchTab('active')">Active</button>
-      <button class="tab" id="tab-done" onclick="switchTab('done')">Done</button>
+    <!-- Section tabs (admin only) -->
+    <div class="sec-tabs" id="sec-tabs" style="display:none;">
+      <button class="sec-tab on" id="sec-pl" onclick="switchSection('pl')">Punchlist</button>
+      <button class="sec-tab"    id="sec-ot" onclick="switchSection('ot')">Office To-Do</button>
     </div>
 
-    <div id="panel-active">
-      <div class="chips">
-        <button class="chip on"  onclick="setFilter('all',this)">All</button>
-        <button class="chip"     onclick="setFilter('open',this)">Open</button>
-        <button class="chip"     onclick="setFilter('inprog',this)">In progress</button>
-        <button class="chip"     onclick="setFilter('high',this)">⚠ High priority</button>
+    <!-- Punchlist panel -->
+    <div id="panel-pl">
+      <div class="sub-tabs">
+        <button class="sub-tab on" id="pl-active-tab" onclick="switchSubTab('pl','active')">Active</button>
+        <button class="sub-tab"    id="pl-done-tab"   onclick="switchSubTab('pl','done')">Done</button>
       </div>
-      <div class="list" id="list-active"></div>
+      <div class="filter-bar" id="pl-filters" style="display:none;">
+        <select id="f-pl-prop"     onchange="applyFilters('pl')"><option value="">All Properties</option></select>
+        <select id="f-pl-type"     onchange="applyFilters('pl')"><option value="">All Types</option></select>
+        <select id="f-pl-assigned" onchange="applyFilters('pl')"><option value="">All People</option></select>
+        <select id="f-pl-priority" onchange="applyFilters('pl')">
+          <option value="">All Priorities</option>
+          <option value="high">High</option>
+          <option value="med">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <select id="f-pl-status"   onchange="applyFilters('pl')">
+          <option value="">All Statuses</option>
+          <option value="open">Open</option>
+          <option value="inprog">In Progress</option>
+        </select>
+        <button class="clear-filters" id="clear-pl" onclick="clearFilters('pl')">✕ Clear</button>
+      </div>
+      <div class="result-count" id="pl-count"></div>
+      <div class="list" id="list-pl"></div>
     </div>
 
-    <div id="panel-done" style="display:none;">
-      <div class="list" id="list-done"></div>
+    <!-- Office To-Do panel -->
+    <div id="panel-ot" style="display:none;">
+      <div class="sub-tabs">
+        <button class="sub-tab on" id="ot-active-tab" onclick="switchSubTab('ot','active')">Active</button>
+        <button class="sub-tab"    id="ot-done-tab"   onclick="switchSubTab('ot','done')">Done</button>
+      </div>
+      <div class="filter-bar" id="ot-filters">
+        <select id="f-ot-prop"     onchange="applyFilters('ot')"><option value="">All Properties</option></select>
+        <select id="f-ot-cat"      onchange="applyFilters('ot')"><option value="">All Categories</option></select>
+        <select id="f-ot-assigned" onchange="applyFilters('ot')"><option value="">All People</option></select>
+        <select id="f-ot-priority" onchange="applyFilters('ot')">
+          <option value="">All Priorities</option>
+          <option value="high">High</option>
+          <option value="med">Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <select id="f-ot-status"   onchange="applyFilters('ot')">
+          <option value="">All Statuses</option>
+          <option value="open">Open</option>
+          <option value="inprog">In Progress</option>
+        </select>
+        <button class="clear-filters" id="clear-ot" onclick="clearFilters('ot')">✕ Clear</button>
+      </div>
+      <div class="result-count" id="ot-count"></div>
+      <div class="list" id="list-ot"></div>
     </div>
 
   </main>
-
 </div>
 
-<!-- FAB -->
 <button class="fab" id="fab" onclick="openNew()" aria-label="New ticket">+</button>
 
 <!-- PIN sheet -->
@@ -315,29 +373,94 @@
            id="pin-input" placeholder="••••" onkeydown="if(event.key==='Enter')checkPin()">
     <div class="pin-err" id="pin-err"></div>
     <div class="sheet-foot">
-      <button class="btn btn-ghost" onclick="closeSheet('ov-pin')">Cancel</button>
+      <button class="btn btn-ghost"   onclick="closeSheet('ov-pin')">Cancel</button>
       <button class="btn btn-primary" onclick="checkPin()">Unlock</button>
     </div>
   </div>
 </div>
 
-<!-- New ticket sheet -->
-<div class="overlay" id="ov-new" onclick="outsideClose(event,'ov-new')">
+<!-- New Punchlist sheet -->
+<div class="overlay" id="ov-pl" onclick="outsideClose(event,'ov-pl')">
   <div class="sheet">
     <div class="handle"></div>
-    <div class="sheet-title">New ticket</div>
-    <div class="field"><label>Title *</label><input type="text" id="n-title" placeholder="e.g. Replace ceiling tile Unit 14B"></div>
-    <div class="field"><label>Property / location</label><input type="text" id="n-loc" placeholder="e.g. 100 Oak St, Lot 14"></div>
-    <div class="field"><label>Description</label><textarea id="n-desc" placeholder="Additional details…"></textarea></div>
+    <div class="sheet-title">New Punchlist Item</div>
+    <div class="field"><label>Title *</label><input type="text" id="pl-title" placeholder="e.g. Replace ceiling tile"></div>
     <div class="two">
-      <div class="field"><label>Priority</label>
-        <select id="n-pri"><option value="high">High</option><option value="med" selected>Medium</option><option value="low">Low</option></select>
+      <div class="field"><label>Property</label>
+        <select id="pl-prop"></select>
       </div>
-      <div class="field"><label>Reported by</label><input type="text" id="n-reporter" placeholder="Tenant name"></div>
+      <div class="field"><label>Work Type</label>
+        <select id="pl-type"></select>
+      </div>
+    </div>
+    <div class="field"><label>Description</label><textarea id="pl-desc" placeholder="Additional details…"></textarea></div>
+    <div class="three">
+      <div class="field"><label>Priority</label>
+        <select id="pl-priority">
+          <option value="high">High</option>
+          <option value="med" selected>Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div class="field"><label>Assigned To</label>
+        <select id="pl-assigned"></select>
+      </div>
+      <div class="field"><label>Created By</label>
+        <select id="pl-createdby"></select>
+      </div>
+    </div>
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Handyman visible</div>
+        <div class="toggle-sub">Show this item in handyman view</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="pl-handyman"><span class="toggle-slider"></span></label>
     </div>
     <div class="sheet-foot">
-      <button class="btn btn-ghost" onclick="closeSheet('ov-new')">Cancel</button>
-      <button class="btn btn-primary" id="btn-create" onclick="submitNew()">Create ticket</button>
+      <button class="btn btn-ghost"   onclick="closeSheet('ov-pl')">Cancel</button>
+      <button class="btn btn-primary" id="btn-pl" onclick="submitPL()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Office To-Do sheet -->
+<div class="overlay" id="ov-ot" onclick="outsideClose(event,'ov-ot')">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-title">New Office To-Do</div>
+    <div class="field"><label>Title *</label><input type="text" id="ot-title" placeholder="e.g. Follow up with insurance broker"></div>
+    <div class="two">
+      <div class="field"><label>Property</label>
+        <select id="ot-prop"></select>
+      </div>
+      <div class="field"><label>Category</label>
+        <select id="ot-cat">
+          <option value="Admin">Admin</option>
+          <option value="Accounting">Accounting</option>
+          <option value="Leasing">Leasing</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Description</label><textarea id="ot-desc" placeholder="Additional details…"></textarea></div>
+    <div class="three">
+      <div class="field"><label>Priority</label>
+        <select id="ot-priority">
+          <option value="high">High</option>
+          <option value="med" selected>Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div class="field"><label>Assigned To</label>
+        <select id="ot-assigned"></select>
+      </div>
+      <div class="field"><label>Created By</label>
+        <select id="ot-createdby"></select>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-ghost"   onclick="closeSheet('ov-ot')">Cancel</button>
+      <button class="btn btn-primary" id="btn-ot" onclick="submitOT()">Create</button>
     </div>
   </div>
 </div>
@@ -346,11 +469,11 @@
 <div class="overlay" id="ov-note" onclick="outsideClose(event,'ov-note')">
   <div class="sheet">
     <div class="handle"></div>
-    <div class="sheet-title">Add note</div>
+    <div class="sheet-title">Add Note</div>
     <div class="field"><label>Note</label><textarea id="note-txt" placeholder="Update, parts needed, observation…" style="height:110px"></textarea></div>
     <div class="sheet-foot">
-      <button class="btn btn-ghost" onclick="closeSheet('ov-note')">Cancel</button>
-      <button class="btn btn-primary" id="btn-note" onclick="submitNote()">Save note</button>
+      <button class="btn btn-ghost"   onclick="closeSheet('ov-note')">Cancel</button>
+      <button class="btn btn-primary" id="btn-note" onclick="submitNote()">Save Note</button>
     </div>
   </div>
 </div>
@@ -359,14 +482,44 @@
 
 <script>
 // ─────────────────────────────────────────────────────────────
-// CONFIG — paste your Apps Script web app URL here
+// CONFIG
 // ─────────────────────────────────────────────────────────────
-const API = 'https://script.google.com/macros/s/AKfycbx2knSihppCryi_Uff4MwYxTP76vfaitIvFor5RzZqBX_pybKIKiVl7oSdSJZPVQfz5pA/exec';
+const API = 'https://script.google.com/macros/s/AKfycbz6I_IPijlYEi9ZA9VhhdvWRX0YSGZ30aIGzHMwXB1K9nV7NkJNf5-0wqk8nvxQYYhbvQ/exec';
+
 // ─────────────────────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────────────────────
+const PROPERTIES = [
+  'General','Boomer','1312 Corporate','Fierro','Royalty Row','Hachita',
+  'Industrial','Lombardy','Marquis','Mid-Sky','Omega','Potomac','Program',
+  'Avalon','Gaslite Village','Greenhill Estates'
+];
 
-let tickets = [], isAdmin = false, curTab = 'active', curFilter = 'all', noteId = null;
+const WORK_TYPES = [
+  'Make Ready','Repairs & Maintenance','Painting','HVAC','Plumbing',
+  'Electrical','Landscape','Property Cleanup','Road & Fence',
+  'Demolition','Signage','Security','Supplies/Materials','Other'
+];
 
-// ── API — all calls use GET to avoid CORS issues ─────────────
+const PEOPLE_PL = ['Dad','G3','Daniel','William','Handyman','General'];
+const PEOPLE_OT = ['Dad','G3','Daniel','William'];
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let plTickets = [], otTickets = [];
+let isAdmin = false;
+let curSection = 'pl';
+let subTab = { pl: 'active', ot: 'active' };
+let filters = {
+  pl: { prop:'', type:'', assigned:'', priority:'', status:'' },
+  ot: { prop:'', cat:'',  assigned:'', priority:'', status:'' }
+};
+let noteCtx = { section: 'pl', id: null };
+
+// ─────────────────────────────────────────────────────────────
+// API
+// ─────────────────────────────────────────────────────────────
 async function api(params) {
   const url = API + '?' + new URLSearchParams(params);
   const r = await fetch(url);
@@ -375,30 +528,87 @@ async function api(params) {
   return j.data;
 }
 
-// ── Boot ─────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// BOOT
+// ─────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+  populateDropdowns();
   if (API === 'YOUR_APPS_SCRIPT_URL_HERE') {
-    document.getElementById('list-active').innerHTML =
-      '<div class="err-banner"><strong>Setup required</strong>Open index.html and replace YOUR_APPS_SCRIPT_URL_HERE with your deployed Apps Script URL.</div>';
+    document.getElementById('list-pl').innerHTML =
+      '<div class="err-banner"><strong>Setup required</strong>Replace YOUR_APPS_SCRIPT_URL_HERE in index.html with your Apps Script URL.</div>';
     return;
   }
   loadTickets();
 });
 
+function populateDropdowns() {
+  // Property selects
+  ['pl-prop','ot-prop','f-pl-prop','f-ot-prop'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isFilter = id.startsWith('f-');
+    if (!isFilter) {
+      PROPERTIES.forEach(p => el.appendChild(opt(p, p)));
+    } else {
+      PROPERTIES.forEach(p => {
+        const o = document.createElement('option');
+        o.value = p; o.textContent = p;
+        el.appendChild(o);
+      });
+    }
+  });
+  // Work type filter
+  const ftype = document.getElementById('f-pl-type');
+  WORK_TYPES.forEach(t => { const o = document.createElement('option'); o.value=t; o.textContent=t; ftype.appendChild(o); });
+  // Work type form
+  const pltype = document.getElementById('pl-type');
+  WORK_TYPES.forEach(t => pltype.appendChild(opt(t,t)));
+  // People
+  ['pl-assigned','pl-createdby'].forEach(id => {
+    const el = document.getElementById(id);
+    PEOPLE_PL.forEach(p => el.appendChild(opt(p,p)));
+  });
+  ['ot-assigned','ot-createdby'].forEach(id => {
+    const el = document.getElementById(id);
+    PEOPLE_OT.forEach(p => el.appendChild(opt(p,p)));
+  });
+  // Filter people
+  const fplp = document.getElementById('f-pl-assigned');
+  PEOPLE_PL.forEach(p => { const o=document.createElement('option'); o.value=p; o.textContent=p; fplp.appendChild(o); });
+  const fotp = document.getElementById('f-ot-assigned');
+  PEOPLE_OT.forEach(p => { const o=document.createElement('option'); o.value=p; o.textContent=p; fotp.appendChild(o); });
+  // OT category filter
+  const fotcat = document.getElementById('f-ot-cat');
+  ['Admin','Accounting','Leasing','Other'].forEach(c => {
+    const o=document.createElement('option'); o.value=c; o.textContent=c; fotcat.appendChild(o);
+  });
+}
+
+function opt(val, label) {
+  const o = document.createElement('option');
+  o.value = val; o.textContent = label; return o;
+}
+
 async function loadTickets() {
-  document.getElementById('list-active').innerHTML = '<div class="loading">Loading…</div>';
+  document.getElementById('list-pl').innerHTML = '<div class="loading">Loading…</div>';
   try {
-    tickets = await api({ action: 'tickets' });
+    const data = await api({ action: 'tickets' });
+    plTickets = data.punchlist || [];
+    otTickets = data.officetodo || [];
     render();
   } catch(e) {
-    document.getElementById('list-active').innerHTML =
-      `<div class="err-banner"><strong>Could not load tickets</strong>${e.message}</div>`;
+    document.getElementById('list-pl').innerHTML =
+      `<div class="err-banner"><strong>Could not load</strong>${e.message}</div>`;
   }
 }
 
-// ── Admin / PIN ──────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────────────────────
 function promptAdmin() {
-  if (isAdmin) { isAdmin = false; updateRole(); render(); return; }
+  if (isAdmin) {
+    isAdmin = false; updateRole(); render(); return;
+  }
   document.getElementById('pin-input').value = '';
   document.getElementById('pin-err').textContent = '';
   openSheet('ov-pin');
@@ -426,98 +636,232 @@ function updateRole() {
   p.textContent = isAdmin ? 'Admin ✕' : 'Handyman';
   p.className = 'role-pill' + (isAdmin ? ' admin' : '');
   document.getElementById('fab').style.display = isAdmin ? 'flex' : 'none';
+  document.getElementById('stats-row').style.display = isAdmin ? 'grid' : 'none';
+  document.getElementById('sec-tabs').style.display  = isAdmin ? 'flex' : 'none';
+  document.getElementById('pl-filters').style.display = isAdmin ? 'flex' : 'none';
+  if (!isAdmin) {
+    // force back to punchlist
+    curSection = 'pl';
+    document.getElementById('panel-pl').style.display = '';
+    document.getElementById('panel-ot').style.display = 'none';
+  }
 }
 
-// ── Tabs / filters ───────────────────────────────────────────
-function switchTab(tab) {
-  curTab = tab;
-  document.getElementById('panel-active').style.display = tab === 'active' ? '' : 'none';
-  document.getElementById('panel-done').style.display   = tab === 'done'   ? '' : 'none';
-  document.getElementById('tab-active').className = 'tab' + (tab === 'active' ? ' active' : '');
-  document.getElementById('tab-done').className   = 'tab' + (tab === 'done'   ? ' active' : '');
+// ─────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────
+function switchSection(sec) {
+  curSection = sec;
+  document.getElementById('panel-pl').style.display = sec === 'pl' ? '' : 'none';
+  document.getElementById('panel-ot').style.display = sec === 'ot' ? '' : 'none';
+  document.getElementById('sec-pl').className = 'sec-tab' + (sec === 'pl' ? ' on' : '');
+  document.getElementById('sec-ot').className = 'sec-tab' + (sec === 'ot' ? ' on' : '');
 }
 
-function setFilter(f, el) {
-  curFilter = f;
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
-  el.classList.add('on');
-  renderActive();
+function switchSubTab(sec, tab) {
+  subTab[sec] = tab;
+  document.getElementById(sec+'-active-tab').className = 'sub-tab' + (tab === 'active' ? ' on' : '');
+  document.getElementById(sec+'-done-tab').className   = 'sub-tab' + (tab === 'done'   ? ' on' : '');
+  renderSection(sec);
 }
 
-// ── Render ───────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// FILTERS
+// ─────────────────────────────────────────────────────────────
+function applyFilters(sec) {
+  if (sec === 'pl') {
+    filters.pl.prop     = document.getElementById('f-pl-prop').value;
+    filters.pl.type     = document.getElementById('f-pl-type').value;
+    filters.pl.assigned = document.getElementById('f-pl-assigned').value;
+    filters.pl.priority = document.getElementById('f-pl-priority').value;
+    filters.pl.status   = document.getElementById('f-pl-status').value;
+  } else {
+    filters.ot.prop     = document.getElementById('f-ot-prop').value;
+    filters.ot.cat      = document.getElementById('f-ot-cat').value;
+    filters.ot.assigned = document.getElementById('f-ot-assigned').value;
+    filters.ot.priority = document.getElementById('f-ot-priority').value;
+    filters.ot.status   = document.getElementById('f-ot-status').value;
+  }
+  updateClearBtn(sec);
+  renderSection(sec);
+}
+
+function clearFilters(sec) {
+  if (sec === 'pl') {
+    ['f-pl-prop','f-pl-type','f-pl-assigned','f-pl-priority','f-pl-status']
+      .forEach(id => document.getElementById(id).value = '');
+    filters.pl = { prop:'', type:'', assigned:'', priority:'', status:'' };
+  } else {
+    ['f-ot-prop','f-ot-cat','f-ot-assigned','f-ot-priority','f-ot-status']
+      .forEach(id => document.getElementById(id).value = '');
+    filters.ot = { prop:'', cat:'', assigned:'', priority:'', status:'' };
+  }
+  updateClearBtn(sec);
+  renderSection(sec);
+}
+
+function updateClearBtn(sec) {
+  const f = filters[sec];
+  const active = Object.values(f).some(v => v !== '');
+  const btn = document.getElementById('clear-' + sec);
+  if (btn) btn.className = 'clear-filters' + (active ? ' visible' : '');
+  // highlight active filter selects
+  const prefix = 'f-' + sec + '-';
+  Object.entries(f).forEach(([k, v]) => {
+    const key = k === 'type' ? 'type' : k === 'cat' ? 'cat' : k;
+    const el = document.getElementById(prefix + key);
+    if (el) el.className = v ? 'active-filter' : '';
+  });
+}
+
+function filterList(list, sec) {
+  const f = filters[sec];
+  return list.filter(t => {
+    if (f.prop     && t.property !== f.prop)     return false;
+    if (f.priority && t.priority !== f.priority) return false;
+    if (f.assigned && t.assigned !== f.assigned) return false;
+    if (f.status   && t.status   !== f.status)   return false;
+    if (sec === 'pl' && f.type && t.workType !== f.type) return false;
+    if (sec === 'ot' && f.cat  && t.category !== f.cat)  return false;
+    return true;
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────
 function render() {
-  const active = tickets.filter(t => !t.archived);
-  const done   = tickets.filter(t =>  t.archived);
-  document.getElementById('cnt-open').textContent = active.filter(t => t.status === 'open').length;
-  document.getElementById('cnt-prog').textContent = active.filter(t => t.status === 'inprog').length;
-  document.getElementById('cnt-done').textContent = done.length;
-  renderActive(); renderDone();
+  // Stats
+  const plActive = plTickets.filter(t => !t.archived);
+  const otActive = otTickets.filter(t => !t.archived);
+  const allActive = [...plActive, ...otActive];
+  document.getElementById('cnt-open').textContent = allActive.filter(t => t.status === 'open').length;
+  document.getElementById('cnt-prog').textContent = allActive.filter(t => t.status === 'inprog').length;
+  document.getElementById('cnt-done').textContent = [...plTickets,...otTickets].filter(t => t.archived).length;
+  renderSection('pl');
+  renderSection('ot');
 }
 
-function renderActive() {
-  let list = tickets.filter(t => !t.archived);
-  if (curFilter === 'open')   list = list.filter(t => t.status === 'open');
-  if (curFilter === 'inprog') list = list.filter(t => t.status === 'inprog');
-  if (curFilter === 'high')   list = list.filter(t => t.priority === 'high');
-  const el = document.getElementById('list-active');
-  el.innerHTML = list.length ? list.map(t => cardHtml(t, false)).join('') :
-    '<div class="empty"><div class="empty-icon">📋</div>No tickets here</div>';
+function renderSection(sec) {
+  const isDone = subTab[sec] === 'done';
+  const all    = sec === 'pl' ? plTickets : otTickets;
+  let list     = all.filter(t => isDone ? t.archived : !t.archived);
+
+  if (!isAdmin && sec === 'pl') {
+    list = list.filter(t => t.handyman);
+  }
+
+  if (isAdmin) list = filterList(list, sec);
+
+  const el    = document.getElementById('list-' + sec);
+  const count = document.getElementById(sec + '-count');
+
+  if (count) count.textContent = list.length ? list.length + ' item' + (list.length !== 1 ? 's' : '') : '';
+
+  if (!list.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">${isDone ? '✅' : '📋'}</div>${isDone ? 'Nothing completed yet' : 'No items here'}</div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(t => sec === 'pl' ? plCardHtml(t, isDone) : otCardHtml(t, isDone)).join('');
 }
 
-function renderDone() {
-  const list = tickets.filter(t => t.archived);
-  const el = document.getElementById('list-done');
-  el.innerHTML = list.length ? list.map(t => cardHtml(t, true)).join('') :
-    '<div class="empty"><div class="empty-icon">✅</div>Nothing in the done pile yet</div>';
+// ─────────────────────────────────────────────────────────────
+// CARD HTML
+// ─────────────────────────────────────────────────────────────
+function priorityDot(p) { return `<span class="pdot p${p ? p[0] : 'm'}"></span>`; }
+function statusBadge(s) {
+  return s === 'open'   ? '<span class="badge bo">Open</span>'
+       : s === 'inprog' ? '<span class="badge bi">In Progress</span>'
+       :                  '<span class="badge bd">Done</span>';
 }
 
-function cardHtml(t, isDone) {
-  const badge = t.status === 'open'   ? '<span class="badge bo">Open</span>'
-              : t.status === 'inprog' ? '<span class="badge bi">In progress</span>'
-              :                         '<span class="badge bd">Done</span>';
-  const pdot = `<span class="pdot p${t.priority[0]}"></span>`;
-  const loc  = t.location ? `<span>📍 ${esc(t.location)}</span>` : '';
-  const rep  = t.reporter ? `<span>👤 ${esc(t.reporter)}</span>` : '';
-  const tid  = `<span class="tid">#${t.id} · ${ago(t.created)}</span>`;
-  const notes = t.notes ? `<div class="card-notes">${esc(t.notes)}</div>` : '';
+function plCardHtml(t, isDone) {
+  const meta = [
+    statusBadge(t.status),
+    t.property  ? `<span class="tag">📍 ${esc(t.property)}</span>` : '',
+    t.workType  ? `<span class="tag">${esc(t.workType)}</span>` : '',
+    t.assigned  ? `<span class="tag">👤 ${esc(t.assigned)}</span>` : '',
+    t.createdBy ? `<span class="tag">✍ ${esc(t.createdBy)}</span>` : '',
+    t.handyman  ? `<span class="tag hm-tag">Handyman</span>` : '',
+    `<span class="tid">#${t.id} · ${ago(t.created)}</span>`
+  ].filter(Boolean).join('');
 
-  const sel = isDone ? '' : `
-    <select class="s-sel" onchange="doStatus(${t.id},this.value)">
-      <option value="open"   ${t.status==='open'   ?'selected':''}>Open</option>
-      <option value="inprog" ${t.status==='inprog' ?'selected':''}>In progress</option>
+  const statusSel = isDone ? '' : `
+    <select class="s-sel" onchange="doStatusPL(${t.id},this.value)">
+      <option value="open"   ${t.status==='open'  ?'selected':''}>Open</option>
+      <option value="inprog" ${t.status==='inprog'?'selected':''}>In Progress</option>
     </select>`;
 
-  const noteBtn = `<button class="abtn note" onclick="openNote(${t.id})">✎ Note</button>`;
-
-  const adminBtns = isAdmin && !isDone
-    ? `<button class="abtn done"    onclick="doDone(${t.id})">✓ Done</button>
-       <button class="abtn del"     onclick="doDel(${t.id})">✕</button>` : '';
-
+  const noteBtn    = `<button class="abtn note" onclick="openNote('pl',${t.id})">✎ Note</button>`;
+  const adminBtns  = isAdmin && !isDone
+    ? `<button class="abtn done" onclick="doDone('pl',${t.id})">✓ Done</button><button class="abtn del" onclick="doDel('pl',${t.id})">✕</button>` : '';
   const restoreBtns = isAdmin && isDone
-    ? `<button class="abtn restore" onclick="doRestore(${t.id})">↩ Restore</button>
-       <button class="abtn del"     onclick="doDel(${t.id})">✕</button>` : '';
+    ? `<button class="abtn restore" onclick="doRestore('pl',${t.id})">↩</button><button class="abtn del" onclick="doDel('pl',${t.id})">✕</button>` : '';
 
-  return `<div class="card${isDone?' done':''}">
-    <div class="card-head"><div class="card-title">${esc(t.title)}</div>${pdot}</div>
-    <div class="card-meta">${badge}${loc}${rep}${tid}</div>
-    ${t.desc ? `<div class="card-desc">${esc(t.desc)}</div>` : ''}
-    ${notes}
-    <div class="card-bar">${sel}${noteBtn}${adminBtns}${restoreBtns}</div>
+  return `<div class="card${isDone?' done-card':''}">
+    <div class="card-head"><div class="card-title">${esc(t.title)}</div>${priorityDot(t.priority)}</div>
+    <div class="card-meta">${meta}</div>
+    ${t.desc  ? `<div class="card-desc">${esc(t.desc)}</div>` : ''}
+    ${t.notes ? `<div class="card-notes">${esc(t.notes)}</div>` : ''}
+    <div class="card-bar">${statusSel}${noteBtn}${adminBtns}${restoreBtns}</div>
   </div>`;
 }
 
-// ── Actions ──────────────────────────────────────────────────
-async function doStatus(id, status) {
-  try {
-    await api({ action: 'updateStatus', id, status });
-    const t = tickets.find(x => x.id == id);
-    if (t) t.status = status;
-    render(); toast('Status updated');
-  } catch(e) { toast('Error: ' + e.message); }
+function otCardHtml(t, isDone) {
+  const meta = [
+    statusBadge(t.status),
+    t.property  ? `<span class="tag">📍 ${esc(t.property)}</span>` : '',
+    t.category  ? `<span class="tag">${esc(t.category)}</span>` : '',
+    t.assigned  ? `<span class="tag">👤 ${esc(t.assigned)}</span>` : '',
+    t.createdBy ? `<span class="tag">✍ ${esc(t.createdBy)}</span>` : '',
+    `<span class="tid">#${t.id} · ${ago(t.created)}</span>`
+  ].filter(Boolean).join('');
+
+  const statusSel = isDone ? '' : `
+    <select class="s-sel" onchange="doStatusOT(${t.id},this.value)">
+      <option value="open"   ${t.status==='open'  ?'selected':''}>Open</option>
+      <option value="inprog" ${t.status==='inprog'?'selected':''}>In Progress</option>
+    </select>`;
+
+  const noteBtn    = `<button class="abtn note" onclick="openNote('ot',${t.id})">✎ Note</button>`;
+  const adminBtns  = isAdmin && !isDone
+    ? `<button class="abtn done" onclick="doDone('ot',${t.id})">✓ Done</button><button class="abtn del" onclick="doDel('ot',${t.id})">✕</button>` : '';
+  const restoreBtns = isAdmin && isDone
+    ? `<button class="abtn restore" onclick="doRestore('ot',${t.id})">↩</button><button class="abtn del" onclick="doDel('ot',${t.id})">✕</button>` : '';
+
+  return `<div class="card${isDone?' done-card':''}">
+    <div class="card-head"><div class="card-title">${esc(t.title)}</div>${priorityDot(t.priority)}</div>
+    <div class="card-meta">${meta}</div>
+    ${t.desc  ? `<div class="card-desc">${esc(t.desc)}</div>` : ''}
+    ${t.notes ? `<div class="card-notes">${esc(t.notes)}</div>` : ''}
+    <div class="card-bar">${statusSel}${noteBtn}${adminBtns}${restoreBtns}</div>
+  </div>`;
 }
 
-function openNote(id) {
-  noteId = id;
+// ─────────────────────────────────────────────────────────────
+// ACTIONS
+// ─────────────────────────────────────────────────────────────
+async function doStatusPL(id, status) {
+  try {
+    await api({ action:'updateStatusPL', id, status });
+    const t = plTickets.find(x => x.id == id);
+    if (t) t.status = status;
+    render(); toast('Status updated');
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+async function doStatusOT(id, status) {
+  try {
+    await api({ action:'updateStatusOT', id, status });
+    const t = otTickets.find(x => x.id == id);
+    if (t) t.status = status;
+    render(); toast('Status updated');
+  } catch(e) { toast('Error: '+e.message); }
+}
+
+function openNote(section, id) {
+  noteCtx = { section, id };
   document.getElementById('note-txt').value = '';
   openSheet('ov-note');
   setTimeout(() => document.getElementById('note-txt').focus(), 80);
@@ -529,71 +873,121 @@ async function submitNote() {
   const btn = document.getElementById('btn-note');
   btn.disabled = true;
   try {
-    await api({ action: 'addNote', id: noteId, note: txt });
+    const action = noteCtx.section === 'pl' ? 'addNotePL' : 'addNoteOT';
+    await api({ action, id: noteCtx.id, note: txt });
     closeSheet('ov-note');
     await loadTickets();
     toast('Note saved');
-  } catch(e) { toast('Error: ' + e.message); }
+  } catch(e) { toast('Error: '+e.message); }
   btn.disabled = false;
 }
 
-async function doDone(id) {
+async function doDone(sec, id) {
   try {
-    await api({ action: 'markDone', id });
+    await api({ action: sec === 'pl' ? 'markDonePL' : 'markDoneOT', id });
     await loadTickets(); toast('Moved to done');
-  } catch(e) { toast('Error: ' + e.message); }
+  } catch(e) { toast('Error: '+e.message); }
 }
 
-async function doDel(id) {
-  if (!confirm('Delete this ticket permanently?')) return;
+async function doDel(sec, id) {
+  if (!confirm('Delete permanently?')) return;
   try {
-    await api({ action: 'deleteTicket', id });
-    tickets = tickets.filter(t => t.id != id);
+    await api({ action: sec === 'pl' ? 'deletePL' : 'deleteOT', id });
+    if (sec === 'pl') plTickets = plTickets.filter(t => t.id != id);
+    else              otTickets = otTickets.filter(t => t.id != id);
     render(); toast('Deleted');
-  } catch(e) { toast('Error: ' + e.message); }
+  } catch(e) { toast('Error: '+e.message); }
 }
 
-async function doRestore(id) {
+async function doRestore(sec, id) {
   try {
-    await api({ action: 'restoreTicket', id });
-    await loadTickets(); toast('Ticket restored');
-  } catch(e) { toast('Error: ' + e.message); }
+    await api({ action: sec === 'pl' ? 'restorePL' : 'restoreOT', id });
+    await loadTickets(); toast('Restored');
+  } catch(e) { toast('Error: '+e.message); }
 }
 
+// ─────────────────────────────────────────────────────────────
+// NEW ITEM FORMS
+// ─────────────────────────────────────────────────────────────
 function openNew() {
-  ['n-title','n-loc','n-desc','n-reporter'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('n-pri').value = 'med';
-  openSheet('ov-new');
-  setTimeout(() => document.getElementById('n-title').focus(), 80);
+  if (curSection === 'pl') {
+    document.getElementById('pl-title').value = '';
+    document.getElementById('pl-desc').value  = '';
+    document.getElementById('pl-handyman').checked = false;
+    document.getElementById('pl-prop').value     = 'General';
+    document.getElementById('pl-type').value     = 'Make Ready';
+    document.getElementById('pl-priority').value = 'med';
+    document.getElementById('pl-assigned').value = 'General';
+    document.getElementById('pl-createdby').value = 'Dad';
+    openSheet('ov-pl');
+    setTimeout(() => document.getElementById('pl-title').focus(), 80);
+  } else {
+    document.getElementById('ot-title').value = '';
+    document.getElementById('ot-desc').value  = '';
+    document.getElementById('ot-prop').value     = 'General';
+    document.getElementById('ot-cat').value      = 'Admin';
+    document.getElementById('ot-priority').value = 'med';
+    document.getElementById('ot-assigned').value = 'Dad';
+    document.getElementById('ot-createdby').value = 'Dad';
+    openSheet('ov-ot');
+    setTimeout(() => document.getElementById('ot-title').focus(), 80);
+  }
 }
 
-async function submitNew() {
-  const title = document.getElementById('n-title').value.trim();
-  if (!title) { document.getElementById('n-title').focus(); return; }
-  const btn = document.getElementById('btn-create');
+async function submitPL() {
+  const title = document.getElementById('pl-title').value.trim();
+  if (!title) { document.getElementById('pl-title').focus(); return; }
+  const btn = document.getElementById('btn-pl');
   btn.disabled = true;
   try {
-    const ticket = {
+    const item = {
       title,
-      location: document.getElementById('n-loc').value.trim(),
-      desc:     document.getElementById('n-desc').value.trim(),
-      priority: document.getElementById('n-pri').value,
-      reporter: document.getElementById('n-reporter').value.trim()
+      property:  document.getElementById('pl-prop').value,
+      workType:  document.getElementById('pl-type').value,
+      desc:      document.getElementById('pl-desc').value.trim(),
+      priority:  document.getElementById('pl-priority').value,
+      assigned:  document.getElementById('pl-assigned').value,
+      createdBy: document.getElementById('pl-createdby').value,
+      handyman:  document.getElementById('pl-handyman').checked
     };
-    await api({ action: 'createTicket', ticket: JSON.stringify(ticket) });
-    closeSheet('ov-new');
+    await api({ action: 'createPL', item: JSON.stringify(item) });
+    closeSheet('ov-pl');
     await loadTickets();
-    toast('Ticket created');
-  } catch(e) { toast('Error: ' + e.message); }
+    toast('Punchlist item created');
+  } catch(e) { toast('Error: '+e.message); }
   btn.disabled = false;
 }
 
-// ── Sheet helpers ────────────────────────────────────────────
+async function submitOT() {
+  const title = document.getElementById('ot-title').value.trim();
+  if (!title) { document.getElementById('ot-title').focus(); return; }
+  const btn = document.getElementById('btn-ot');
+  btn.disabled = true;
+  try {
+    const item = {
+      title,
+      property:  document.getElementById('ot-prop').value,
+      category:  document.getElementById('ot-cat').value,
+      desc:      document.getElementById('ot-desc').value.trim(),
+      priority:  document.getElementById('ot-priority').value,
+      assigned:  document.getElementById('ot-assigned').value,
+      createdBy: document.getElementById('ot-createdby').value
+    };
+    await api({ action: 'createOT', item: JSON.stringify(item) });
+    closeSheet('ov-ot');
+    await loadTickets();
+    toast('Office to-do created');
+  } catch(e) { toast('Error: '+e.message); }
+  btn.disabled = false;
+}
+
+// ─────────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────────
 function openSheet(id)  { document.getElementById(id).classList.add('open'); }
 function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
 function outsideClose(e, id) { if (e.target.id === id) closeSheet(id); }
 
-// ── Utils ────────────────────────────────────────────────────
 function ago(iso) {
   if (!iso) return '';
   const d = Math.floor((Date.now() - new Date(iso)) / 60000);
