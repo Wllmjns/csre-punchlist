@@ -369,7 +369,7 @@ let tickets = [], isAdmin = false, curTab = 'active', curFilter = 'all', noteId 
 // ── API — all calls use GET to avoid CORS issues ─────────────
 async function api(params) {
   const url = API + '?' + new URLSearchParams(params);
-  const r = await fetch(url, { redirect: 'follow' });
+  const r = await fetch(url);
   const j = await r.json();
   if (!j.ok) throw new Error(j.error || 'API error');
   return j.data;
